@@ -1,11 +1,13 @@
 package Acme::CPANModulesUtil::Bencher;
 
-# DATE
-# VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
 
 our %SPEC;
 
@@ -96,6 +98,12 @@ sub gen_bencher_scenario {
     $scenario->{description} = "This scenario is generated from ".
         ($mod ? "<pm:$mod>" : "an <pm:Acme::CPANModules> list").".";
 
+    for (qw/datasets/) {
+        if ($list->{"bench_$_"}) {
+            $scenario->{$_} = $list->{"bench_$_"};
+        }
+    }
+
     for my $e (@{ $list->{entries} }) {
         my @per_function_participants;
 
@@ -110,11 +118,14 @@ sub gen_bencher_scenario {
                     module => $e->{module},
                     function => $fname,
                 };
+                my $has_bench_code;
                 for (qw/code code_template fcall_template/) {
-                    if ($fspec->{"bench_$_"}) {
+                    if (defined $fspec->{"bench_$_"}) {
                         $p->{$_} = $fspec->{"bench_$_"};
+                        $has_bench_code++;
                     }
                 }
+                next unless $has_bench_code;
                 push @per_function_participants, $p;
             }
         }
@@ -129,14 +140,10 @@ sub gen_bencher_scenario {
                 $p->{$_} = $e->{"bench_$_"};
             }
         }
-        push @{ $scenario->{participants} }, $p if $has_bench_code || !@per_function_participants;
-        push @{ $scenario->{participants} }, @per_function_participants;
-    }
-
-    for (qw/datasets/) {
-        if ($list->{"bench_$_"}) {
-            $scenario->{$_} = $list->{"bench_$_"};
+        if ($has_bench_code || (!@per_function_participants && !$scenario->{datasets})) {
+            push @{ $scenario->{participants} }, $p;
         }
+        push @{ $scenario->{participants} }, @per_function_participants;
     }
 
     [200, "OK", $scenario];
