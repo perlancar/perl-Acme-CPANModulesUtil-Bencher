@@ -1,3 +1,5 @@
+# no code
+## no critic: TestingAndDebugging::RequireUseStrict
 package Bencher::Util::CPANModules;
 
 # AUTHORITY
