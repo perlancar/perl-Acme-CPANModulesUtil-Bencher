@@ -4,6 +4,8 @@ use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
 
+use Exporter qw(import);
+
 # AUTHORITY
 # DATE
 # DIST
@@ -11,7 +13,6 @@ use warnings;
 
 our %SPEC;
 
-use Exporter qw(import);
 our @EXPORT_OK = qw(gen_bencher_scenario);
 
 $SPEC{gen_bencher_scenario} = {
@@ -137,6 +138,11 @@ sub gen_bencher_scenario {
         for (qw/code code_template fcall_template/) {
             if ($e->{"bench_$_"}) {
                 $has_bench_code++;
+                $p->{$_} = $e->{"bench_$_"};
+            }
+        }
+        for (qw/include_by_default/) {
+            if (exists $e->{"bench_$_"}) {
                 $p->{$_} = $e->{"bench_$_"};
             }
         }
