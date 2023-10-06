@@ -127,6 +127,11 @@ sub gen_bencher_scenario {
                     }
                 }
                 next unless $has_bench_code;
+                for (qw/tags/) {
+                    if (defined $fspec->{"bench_$_"}) {
+                        $p->{$_} = $fspec->{"bench_$_"};
+                    }
+                }
                 push @per_function_participants, $p;
             }
         }
@@ -141,7 +146,7 @@ sub gen_bencher_scenario {
                 $p->{$_} = $e->{"bench_$_"};
             }
         }
-        for (qw/include_by_default/) {
+        for (qw/tags include_by_default/) {
             if (exists $e->{"bench_$_"}) {
                 $p->{$_} = $e->{"bench_$_"};
             }
